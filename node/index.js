@@ -1,23 +1,39 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require('express');
+const app = express();
+const port = 3000;
+
 const config = {
     host: 'db',
     user: 'root',
     password: 'root',
-    database: 'nodedb'
+    database: 'nodedb',
 };
-const mysql = require('mysql')
-const connection = mysql.createConnection(config)
 
 app.get('/', (req, res) => {
-    const sql = `INSERT INTO people(name) values('Aluno')`
+
+    const mysql = require('mysql');
+    const connection = mysql.createConnection(config)
+
+    const sql = `INSERT INTO people(name) values('Aluno FullCycle')`
     connection.query(sql)
 
-    connection.query(`SELECT nome FROM people`, (error, results, fields) => {
-        res.send(`<h1>Full Cycle Rocks!</h1>
-        <ol>${!!results.length ? results.map(i => `<li>${i.nome}</li>`).join('') : ''}</ol>`)
-    })
+    const sql2 = `SELECT name FROM people`;  
+  
+    connection.query(sql2, (error, results, fields) => {
+      if (error) {
+        throw error
+      };
+      
+      let html = '<h1>Full Cycle Rocks!</h1><table>';
+      html += '<tr><th>Nome</th></tr>';
+      for(let people of results) {      
+        html += `<tr><td>${people.name}</td></tr>`;
+      }
+  
+      html += '</table>';    
+      res.send(html);
+    });   
+    connection.end();  
 })
 
 app.listen(port, ()=> {
